@@ -24,11 +24,12 @@ users = read_users_csv(pa.raw / "users.csv")
 require_columns(orders, ["order_id", "status", "amount", "quantity"])
 assert_non_empty(orders)
 
-require_columns(users, ["user_id", "1 country","signup_date"])
+require_columns(users, ["user_id", "country","signup_date"])
 assert_non_empty(users)
 
 
 df = enforce_schema(orders)
+
 
 
 report_df = missingness_report(df)
@@ -44,6 +45,7 @@ assert_in_range(df["amount"], lo=0, name="amount")
 assert_in_range(df["quantity"], lo=0, name="quantity")
 
 write_parquet(df, pa.processed / "orders_clean.parquet")
+
 
 print("Day 2 finished successfully!")
 

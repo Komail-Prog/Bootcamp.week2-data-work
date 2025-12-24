@@ -14,9 +14,11 @@ rows = read_orders_csv(pa.raw / "orders.csv")
 
 enforced_data = enforce_schema(rows)
 
-out_path = ROOT / "data" / "processed" / "orders.parquet"
+out_path = pa.processed 
 
 
 write_parquet(enforced_data, out_path)
 
 print(f"Processed data saved to {out_path}")
+
+
