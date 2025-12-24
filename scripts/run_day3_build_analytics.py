@@ -48,10 +48,11 @@ country_stats = (
 )
 
 
-print("\n--- Revenue by Country ---")
+print("\n Revenue by Country ")
 print(country_stats)
 
 
 country_stats.to_csv(pa.reports / "revenue_by_country.csv", index=False)
 
 print("Day 3: Analytics table built successfully!")
+

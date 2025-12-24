@@ -9,6 +9,7 @@ class Paths:
     processed: Path
     external: Path
     reports: Path
+    figures:Path
 
 def make_paths(root: Path) -> Paths:
     data = root / "data"
@@ -20,6 +21,7 @@ def make_paths(root: Path) -> Paths:
         processed=data / "processed",
         external=data / "external",
         reports=reports,
+        figures=reports / "figures",
     )
 
     

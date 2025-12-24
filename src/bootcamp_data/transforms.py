@@ -58,7 +58,7 @@ def add_time_parts(df: pd.DataFrame, ts_col: str) -> pd.DataFrame:
     date=ts.dt.date,
     year=ts.dt.year,
     month=ts.dt.to_period("M").astype("string"),
-    dow=ts.dt.day_name(),
+    day=ts.dt.day_name(),
     hour=ts.dt.hour,
     )
 
