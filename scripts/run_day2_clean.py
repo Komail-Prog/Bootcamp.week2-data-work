@@ -19,21 +19,25 @@ pa = make_paths(ROOT)
 orders = read_orders_csv(pa.raw / "orders.csv")
 users = read_users_csv(pa.raw / "users.csv")
 
+for col in ["order_id", "amount", "quantity"]:
+    if col not in users.columns:
+        users[col] = None
 
 
-require_columns(orders, ["order_id", "status", "amount", "quantity"])
+require_columns(orders, ["order_id","user_id","amount","quantity","created_at","status"])
 assert_non_empty(orders)
 
-require_columns(users, ["user_id", "country","signup_date"])
+require_columns(users, ["user_id","country","signup_date"])
 assert_non_empty(users)
 
-
+users_clean = enforce_schema(users)
 df = enforce_schema(orders)
 
 
 
 report_df = missingness_report(df)
 report_df.to_csv(pa.reports / "missingness_report.csv", index=False)
+
 
 
 df["status_clean"] = normalize_text(df["status"]) 
@@ -45,7 +49,7 @@ assert_in_range(df["amount"], lo=0, name="amount")
 assert_in_range(df["quantity"], lo=0, name="quantity")
 
 write_parquet(df, pa.processed / "orders_clean.parquet")
-
+write_parquet(users_clean, pa.processed / "users_clean.parquet")
 
 print("Day 2 finished successfully!")
 

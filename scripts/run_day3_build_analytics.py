@@ -8,7 +8,7 @@ sys.path.append(str(ROOT / "src"))
 from bootcamp_data.config import make_paths
 from bootcamp_data.io import read_parquet,write_parquet
 from bootcamp_data.quality import require_columns, assert_non_empty, assert_unique_key
-from bootcamp_data.transforms import parse_datetime, add_time_parts, winsorize
+from bootcamp_data.transforms import parse_datetime, add_time_parts, winsorize,apply_mapping,normalize_text
 from bootcamp_data.joins import safe_left_join
 
 pa = make_paths(ROOT)
@@ -17,8 +17,19 @@ orders = read_parquet(pa.processed / "orders_clean.parquet")
 users = read_parquet(pa.processed / "users_clean.parquet")
 
 
+require_columns(orders, ["order_id", "user_id", "amount", "status", "created_at"])
 assert_non_empty(orders)
 assert_unique_key(users, "user_id")
+
+orders["status_norm"] = normalize_text(orders["status"])
+
+
+status_mapping = {
+    "paid": "paid", 
+    "refund": "refund", 
+    "refunded": "refund"
+}
+orders["status_clean"] = apply_mapping(orders["status_norm"], status_mapping)
 
 orders = parse_datetime(orders, "created_at")
 orders = add_time_parts(orders, "created_at")

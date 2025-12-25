@@ -2,12 +2,27 @@ import pandas as pd
 import re
 
 def enforce_schema(df: pd.DataFrame) -> pd.DataFrame:
- return df.assign(
-    order_id=df["order_id"].astype("string"),
-    user_id=df["user_id"].astype("string"),
-    amount=pd.to_numeric(df["amount"], errors="coerce").astype("Float64"),
-    quantity=pd.to_numeric(df["quantity"], errors="coerce").astype("Int64"),
-)
+    df = df.copy()
+    
+   
+    schema_map = {
+        "order_id": ("string", None),
+        "user_id": ("string", None),
+        "amount": ("Float64", "numeric"),
+        "quantity": ("Int64", "numeric"),
+        "country": ("string", None),
+        "status": ("string", None)
+    }
+
+    for col, (dtype, strategy) in schema_map.items():
+        if col in df.columns:
+            if strategy == "numeric":
+                df[col] = pd.to_numeric(df[col], errors="coerce").astype(dtype)
+            else:
+                df[col] = df[col].astype(dtype)
+                
+    return df
+
 
 
 def missingness_report(df: pd.DataFrame) -> pd.DataFrame:
@@ -45,25 +60,23 @@ def parse_datetime(
     *,
     utc: bool = True,
 ) -> pd.DataFrame:
-    # Parse a timestamp column safely.
-    # - invalid strings become NA (errors="coerce")
-    # - utc=True gives timezone-aware timestamps (recommended default)
+
     dt = pd.to_datetime(df[col], errors="coerce", utc=utc)
     return df.assign(**{col: dt})
 
 def add_time_parts(df: pd.DataFrame, ts_col: str) -> pd.DataFrame:
-    # Add common time grouping keys (month, day-of-week, hour, etc.).
+  
     ts = df[ts_col]
     return df.assign(
     date=ts.dt.date,
     year=ts.dt.year,
     month=ts.dt.to_period("M").astype("string"),
-    day=ts.dt.day_name(),
+    dow=ts.dt.day_name(),
     hour=ts.dt.hour,
     )
 
 def iqr_bounds(s: pd.Series, k: float = 1.5) -> tuple[float, float]:
-    # Return (lo, hi) IQR bounds for outlier flagging.
+
     x = s.dropna()
     q1 = x.quantile(0.25)
     q3 = x.quantile(0.75)
@@ -71,7 +84,7 @@ def iqr_bounds(s: pd.Series, k: float = 1.5) -> tuple[float, float]:
     return float(q1 - k * iqr), float(q3 + k * iqr)
 
 def winsorize(s: pd.Series, lo: float = 0.01, hi: float = 0.99) -> pd.Series:
-    # Cap values to [p_lo, p_hi] (helpful for visualization, not deletion).
+    
     x = s.dropna()
     a, b = x.quantile(lo), x.quantile(hi)
     return s.clip(lower=a, upper=b)
