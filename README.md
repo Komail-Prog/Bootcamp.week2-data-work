@@ -21,12 +21,13 @@ Produces joined tables with engineered time features and outlier flags.
 Auditability
 Every run generates a _run_meta.json file with row counts, match rates, and timestamps.
 
-1. Setup & Installation
+Setup & Installation
 Prerequisites
 
 Python 3.10+
 
 uv installed
+(If not installed:)
 
 pip install uv
 
@@ -37,14 +38,13 @@ Clone the repository and enter the project folder:
 cd week2-data-work
 
 
-Create and sync the virtual environment
-This creates a virtual environment and installs all dependencies in seconds.
+Create and sync the virtual environment:
 
 uv venv
 uv sync
 
 
-Activate the environment
+Activate the environment:
 
 Windows
 
@@ -55,15 +55,13 @@ macOS / Linux
 
 source .venv/bin/activate
 
-2. How to Run
+How to Run
 Run the ETL Pipeline (Master Switch)
 
-This command extracts raw CSV data, transforms and validates it, and writes all processed datasets and metadata.
+This is the single command to process all data.
+It reads from data/raw/, cleans and validates the data, and writes outputs to data/processed/.
 
-Run the command from inside the scripts/ directory:
-
-cd scripts
-uv run run_etl.py
+python scripts/run_etl.py
 
 Run the EDA Notebook
 
@@ -73,27 +71,20 @@ Set the kernel to the .venv created by uv
 
 Run all cells
 
-Generated figures will be saved to:
+Visualizations will be exported to:
 
 reports/figures/
 
-Run the Streamlit Dashboard
-
-From the project root:
-
-uv run streamlit run scripts/app.py
-
-3. Expected Outputs
+Expected Outputs
 
 After running run_etl.py, the data/processed/ folder will contain:
 
 Path	Description
 analytics_table.parquet	Primary output: joined, cleaned, and engineered dataset
-orders_clean.parquet	Cleaned orders with engineered features and outlier flags
 users_clean.parquet	Standardized and de-duplicated user records
-_run_meta.json	Audit receipt: row counts, match rates, timestamps
-reports/summary.md	Business summary of analytical findings
-4. FAQ
+_run_meta.json	Audit receipt: row counts, match rates, and run timestamps
+reports/summary.md	Business summary of analytical findings and caveats
+FAQ
 What if I get a KeyError?
 
 The pipeline validates that order_id and user_id exist.
